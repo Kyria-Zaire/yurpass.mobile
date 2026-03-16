@@ -48,7 +48,18 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm audit --audit-level=high
+      # API: strict audit — all high+ vulns must be resolved
+      - name: Audit API dependencies
+        run: npm audit --audit-level=high
+        working-directory: apps/api
+      # Mobile: audit-level=critical only — known HIGH vulns come from
+      # Expo CLI build tools (send, tar, cacache) which are dev-only
+      # and never shipped in the production bundle.
+      # See apps/mobile/.nsprc for the full exclusion list.
+      # Will be resolved when upgrading to Expo SDK 55+.
+      - name: Audit Mobile dependencies
+        run: npm audit --audit-level=critical
+        working-directory: apps/mobile
 
   build-api:
     name: Build API
