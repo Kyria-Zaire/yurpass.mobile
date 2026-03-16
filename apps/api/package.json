@@ -1,0 +1,38 @@
+{
+  "name": "@yurpass/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@hono/zod-validator": "^0.4.0",
+    "bcryptjs": "^2.4.3",
+    "better-auth": "^1.1.0",
+    "bullmq": "^5.30.0",
+    "cloudinary": "^2.5.0",
+    "hono": "^4.6.0",
+    "ioredis": "^5.4.0",
+    "mongoose": "^8.9.0",
+    "nanoid": "^5.0.0",
+    "pino": "^9.5.0",
+    "pino-pretty": "^13.0.0",
+    "resend": "^4.0.0",
+    "socket.io": "^4.8.0",
+    "zod": "^3.24.0",
+    "@yurpass/types": "*",
+    "@yurpass/validators": "*"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

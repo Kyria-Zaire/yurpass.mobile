@@ -1,0 +1,57 @@
+# Environment — NEVER committed
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+dist/
+build/
+.expo/
+.next/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# Logs
+*.log
+logs/
+
+# Tests
+coverage/
+
+# Keys & certificates
+*.pem
+*.key
+*.cert
+*.p12
+*.keystore
+
+# Turbo cache
+.turbo/
+
+# Expo
+ios/
+android/
+*.jks
+*.p8
+*.mobileprovision
+
+# Windows
+$RECYCLE.BIN/
+*.lnk

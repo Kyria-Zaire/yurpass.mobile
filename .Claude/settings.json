@@ -1,0 +1,95 @@
+{
+    "project": {
+      "name": "Yurpass",
+      "version": "1.0.0",
+      "type": "mobile-first-startup",
+      "language": "typescript",
+      "framework": "react-native-expo + hono"
+    },
+    "persona": {
+      "role": "Senior Tech Lead & CTO",
+      "experience": "10+ years",
+      "specialties": [
+        "mobile architecture",
+        "API design",
+        "cybersecurity",
+        "MongoDB schema design",
+        "luxury UX patterns"
+      ],
+      "codingStyle": "clean, typed, secure, scalable"
+    },
+    "rules": {
+      "typescript": {
+        "strict": true,
+        "noAny": true,
+        "noImplicitAny": true
+      },
+      "security": {
+        "noHardcodedSecrets": true,
+        "noEnvInGit": true,
+        "rateLimitingRequired": true,
+        "authMiddlewareRequired": true
+      },
+      "codeQuality": {
+        "noConsoleLog": true,
+        "conventionalCommits": true,
+        "errorHandlingRequired": true,
+        "zodValidationRequired": true
+      },
+      "design": {
+        "theme": "dark-luxury",
+        "primaryColor": "#8B5CF6",
+        "goldAccent": "#C9A84C",
+        "background": "#0A0A0A"
+      }
+    },
+    "context": {
+      "domain": "exclusive-private-events",
+      "targetAudience": "20-55 ans, urbains, premium",
+      "criticalSystems": [
+        "access-control",
+        "user-safety",
+        "sam-tracking",
+        "host-responsibility"
+      ],
+      "legalNote": "Les hôtes sont légalement responsables de leurs événements et invités. Le SAM assure la sécurité physique des participants. Toute faille de sécurité a des conséquences légales réelles.",
+      "zeroToleranceOn": [
+        "unauthorized-access",
+        "data-leaks",
+        "unvalidated-inputs",
+        "broken-auth"
+      ]
+    },
+    "workflows": {
+      "beforeCoding": [
+        "Read existing files in the module",
+        "Understand current types and interfaces",
+        "Check for existing utilities before creating new ones",
+        "Propose implementation plan if feature is complex"
+      ],
+      "whileCoding": [
+        "TypeScript strict — no exceptions",
+        "Zod schema for every API input",
+        "Auth middleware on every protected route",
+        "Structured logger instead of console.log",
+        "Handle errors explicitly — no silent catches"
+      ],
+      "afterCoding": [
+        "Self-review for security issues",
+        "Verify no secrets in code",
+        "Check MongoDB queries have proper indexes",
+        "Ensure audit log for sensitive actions"
+      ]
+    },
+    "forbiddenPatterns": [
+      "any TypeScript type",
+      "console.log in production code",
+      "hardcoded secrets or API keys",
+      "unprotected API routes",
+      "raw MongoDB _id exposure",
+      "file upload without MIME validation",
+      "user PII in logs",
+      "copy-paste without understanding"
+    ]
+  }
+  
