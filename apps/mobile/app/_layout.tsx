@@ -1,9 +1,12 @@
 import { useEffect, useState, useCallback } from 'react'
-import { View } from 'react-native'
+import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { Stack } from 'expo-router'
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useAuthStore } from '../stores/auth.store'
+import { useProtectedRoute } from '../hooks/useProtectedRoute'
+import { useInactivityLogout } from '../hooks/useInactivityLogout'
 import { COLORS } from '../constants/theme'
 
 SplashScreen.preventAutoHideAsync()
@@ -17,8 +20,34 @@ const queryClient = new QueryClient({
   },
 })
 
+function RootNavigator(): React.JSX.Element | null {
+  const { isLoading } = useAuthStore()
+
+  useProtectedRoute()
+  useInactivityLogout()
+
+  if (isLoading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color={COLORS.accent} />
+      </View>
+    )
+  }
+
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: COLORS.bg },
+        animation: 'fade',
+      }}
+    />
+  )
+}
+
 export default function RootLayout(): React.JSX.Element | null {
   const [appReady, setAppReady] = useState(false)
+  const initialize = useAuthStore((s) => s.initialize)
 
   const [fontsLoaded] = useFonts({
     PlayfairDisplay: require('../assets/fonts/PlayfairDisplay-Regular.ttf'),
@@ -41,21 +70,32 @@ export default function RootLayout(): React.JSX.Element | null {
     void onLayoutRootView()
   }, [onLayoutRootView])
 
+  useEffect(() => {
+    void initialize()
+  }, [initialize])
+
   if (!fontsLoaded || !appReady) {
     return null
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <View style={{ flex: 1, backgroundColor: COLORS.bg }} onLayout={onLayoutRootView}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: COLORS.bg },
-            animation: 'fade',
-          }}
-        />
+      <View style={styles.root} onLayout={onLayoutRootView}>
+        <RootNavigator />
       </View>
     </QueryClientProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.bg,
+  },
+})
