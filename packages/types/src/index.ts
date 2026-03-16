@@ -1,3 +1,5 @@
+// ─── Enums ───────────────────────────────────────────────
+
 export enum UserRole {
   GUEST = 'guest',
   HOST = 'host',
@@ -59,4 +61,140 @@ export enum AccessType {
 export enum AuditResult {
   SUCCESS = 'success',
   FAILURE = 'failure',
+}
+
+// ─── Interfaces ──────────────────────────────────────────
+
+export interface IUserProfile {
+  displayName: string
+  avatarUrl?: string
+  bio?: string
+  city: string
+  verifiedAt?: Date
+}
+
+export interface IUserReputation {
+  score: number
+  totalRatings: number
+  avgRating: number
+}
+
+export interface IUserSecurity {
+  twoFactorEnabled: boolean
+  twoFactorSecret?: string
+  loginAttempts: number
+  lockedUntil?: Date
+  lastLoginAt?: Date
+  lastLoginIp?: string
+}
+
+export interface IUserSubscription {
+  plan: SubscriptionPlan
+  expiresAt?: Date
+}
+
+export interface IUser {
+  publicId: string
+  email: string
+  passwordHash: string
+  roles: UserRole[]
+  profile: IUserProfile
+  reputation: IUserReputation
+  security: IUserSecurity
+  subscription: IUserSubscription
+  deletedAt?: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IEventTheme {
+  id: string
+  name: string
+  dresscode: string
+}
+
+export interface IEventSchedule {
+  startDate: Date
+  endDate: Date
+  doorsOpenAt: Date
+}
+
+export interface IEventVenue {
+  city: string
+  address?: string
+  coordinates?: {
+    lat: number
+    lng: number
+  }
+}
+
+export interface IEventCapacity {
+  max: number
+  confirmed: number
+  waitlist: number
+}
+
+export interface IEventAccess {
+  type: AccessType
+  requiresContribution: boolean
+  contributionDetails?: string
+}
+
+export interface IEvent {
+  publicId: string
+  hostId: string
+  title: string
+  description: string
+  theme: IEventTheme
+  schedule: IEventSchedule
+  venue: IEventVenue
+  capacity: IEventCapacity
+  access: IEventAccess
+  status: EventStatus
+  samRequired: boolean
+  samId?: string
+  mediaUrls: string[]
+  isPrivate: boolean
+  deletedAt?: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IParticipationContribution {
+  type: string
+  validated: boolean
+  validatedBy?: string
+}
+
+export interface IParticipationAccessCode {
+  code: string
+  generatedAt: Date
+  usedAt?: Date
+  invalidated: boolean
+}
+
+export interface IParticipation {
+  publicId: string
+  userId: string
+  eventId: string
+  status: ParticipationStatus
+  contribution?: IParticipationContribution
+  accessCode?: IParticipationAccessCode
+  invitedBy?: string
+  hostNote?: string
+  checkedInAt?: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IAuditLog {
+  action: AuditAction
+  userId?: string
+  targetId?: string
+  eventId?: string
+  metadata: Record<string, unknown>
+  ipAddress?: string
+  userAgent?: string
+  result: AuditResult
+  createdAt: Date
 }
