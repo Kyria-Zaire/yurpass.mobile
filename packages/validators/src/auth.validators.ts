@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { emailSchema, passwordSchema } from './index.js'
+import { emailSchema, passwordSchema } from './base.js'
 
 export const registerSchema = z.object({
   email: emailSchema,

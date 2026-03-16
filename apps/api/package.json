@@ -8,11 +8,15 @@
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.0",
     "@hono/zod-validator": "^0.4.0",
+    "@yurpass/types": "*",
+    "@yurpass/validators": "*",
     "bcryptjs": "^2.4.3",
     "better-auth": "^1.1.0",
     "bullmq": "^5.30.0",
@@ -25,14 +29,13 @@
     "pino-pretty": "^13.0.0",
     "resend": "^4.0.0",
     "socket.io": "^4.8.0",
-    "zod": "^3.24.0",
-    "@yurpass/types": "*",
-    "@yurpass/validators": "*"
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.10.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.0"
   }
 }
