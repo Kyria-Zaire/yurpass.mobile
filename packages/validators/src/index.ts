@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 export * from './auth.validators.js'
+export * from './role.validators.js'
 
 export const emailSchema = z.string().email().toLowerCase().trim()
 

@@ -7,6 +7,7 @@ import { connectRedis, getRedis } from './lib/redis.js'
 import { requestLogger } from './middlewares/logger.js'
 import { health } from './routes/health.js'
 import { authRoutes } from './routes/auth.routes.js'
+import { rolesRoutes } from './routes/roles.routes.js'
 import { createAccountWorker } from './workers/account.worker.js'
 
 const app = new Hono()
@@ -14,6 +15,7 @@ const app = new Hono()
 app.use('*', requestLogger)
 app.route('/', health)
 app.route('/auth', authRoutes)
+app.route('/roles', rolesRoutes)
 
 async function bootstrap(): Promise<void> {
   try {
