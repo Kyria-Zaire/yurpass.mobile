@@ -1,0 +1,28 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    name: CI Gate
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [ci]
+    steps:
+      - uses: actions/checkout@v4
+
+      # Placeholder for Railway/Render deployment
+      # - name: Deploy to Railway
+      #   uses: railwayapp/deploy@v1
+      #   with:
+      #     service: yurpass-api
+      #     token: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Success
+        run: echo "::notice::Staging deployment ready. Configure Railway/Render secrets to enable auto-deploy."
