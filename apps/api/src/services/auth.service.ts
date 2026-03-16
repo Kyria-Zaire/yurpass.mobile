@@ -20,9 +20,8 @@ const VERIFICATION_TOKEN_TTL = 86400
 const RESET_TOKEN_TTL = 3600
 
 function getAccountQueue(): Queue {
-  // BullMQ bundles its own ioredis types — cast needed for compatibility
-  const connection = getRedis() as unknown as Record<string, unknown>
-  return new Queue('account', { connection: connection as never })
+  // BullMQ manages its own Redis connections — pass URL config
+  return new Queue('account', { connection: { url: env.REDIS_URL } as never })
 }
 
 export class AuthService {

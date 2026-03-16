@@ -3,13 +3,15 @@ import { createHash } from 'node:crypto'
 import { User } from '../models/user.model.js'
 import { AuditLog } from '../models/audit-log.model.js'
 import { logger } from '../lib/logger.js'
+import { env } from '../lib/env.js'
 import { AuditAction, AuditResult } from '@yurpass/types'
+
 interface AnonymizeAccountJob {
   publicId: string
 }
 
-export function createAccountWorker(connection: unknown): Worker {
-  // BullMQ bundles its own ioredis types — cast needed for compatibility
+export function createAccountWorker(): Worker {
+  // BullMQ manages its own Redis connections — pass URL config, not a shared client
   const worker = new Worker<AnonymizeAccountJob>(
     'account',
     async (job) => {
@@ -17,7 +19,7 @@ export function createAccountWorker(connection: unknown): Worker {
         await anonymizeAccount(job.data.publicId)
       }
     },
-    { connection: connection as never },
+    { connection: { url: env.REDIS_URL } as never },
   )
 
   worker.on('completed', (job) => {

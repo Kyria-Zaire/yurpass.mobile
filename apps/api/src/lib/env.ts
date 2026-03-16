@@ -3,14 +3,20 @@ import { z } from 'zod'
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
-  MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
+  MONGODB_URI: z
+    .string()
+    .min(1, 'MONGODB_URI is required')
+    .refine(
+      (uri) => uri.startsWith('mongodb://') || uri.startsWith('mongodb+srv://'),
+      'MONGODB_URI must start with mongodb:// or mongodb+srv://',
+    ),
   REDIS_URL: z.string().min(1, 'REDIS_URL is required'),
   BETTER_AUTH_SECRET: z.string().min(32, 'BETTER_AUTH_SECRET must be at least 32 characters'),
   BETTER_AUTH_URL: z.string().url(),
-  CLOUDINARY_CLOUD_NAME: z.string().min(1, 'CLOUDINARY_CLOUD_NAME is required'),
-  CLOUDINARY_API_KEY: z.string().min(1, 'CLOUDINARY_API_KEY is required'),
-  CLOUDINARY_API_SECRET: z.string().min(1, 'CLOUDINARY_API_SECRET is required'),
-  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
+  CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
+  CLOUDINARY_API_KEY: z.string().optional().default(''),
+  CLOUDINARY_API_SECRET: z.string().optional().default(''),
+  RESEND_API_KEY: z.string().optional().default(''),
 })
 
 export type Env = z.infer<typeof envSchema>

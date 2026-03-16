@@ -4,10 +4,26 @@ WORKDIR /app
 
 RUN npm install -g tsx
 
-COPY package.json ./
-RUN npm install
+# Copy root workspace files
+COPY package.json package-lock.json turbo.json tsconfig.base.json ./
 
-COPY src ./src
+# Copy package manifests for all workspaces
+COPY packages/types/package.json packages/types/tsconfig.json ./packages/types/
+COPY packages/validators/package.json packages/validators/tsconfig.json ./packages/validators/
+COPY apps/api/package.json apps/api/tsconfig.json ./apps/api/
+
+# Install all workspace dependencies
+RUN npm ci --workspace=@yurpass/types --workspace=@yurpass/validators --workspace=@yurpass/api
+
+# Copy source code
+COPY packages/types/src ./packages/types/src
+COPY packages/validators/src ./packages/validators/src
+COPY apps/api/src ./apps/api/src
+
+# Build shared packages
+RUN npx turbo run build --filter=@yurpass/types --filter=@yurpass/validators
+
+WORKDIR /app/apps/api
 
 EXPOSE 3000
 

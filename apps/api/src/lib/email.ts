@@ -2,7 +2,17 @@ import { Resend } from 'resend'
 import { env } from './env.js'
 import { logger } from './logger.js'
 
-const resend = new Resend(env.RESEND_API_KEY)
+let resend: Resend | null = null
+
+function getResendClient(): Resend | null {
+  if (!env.RESEND_API_KEY) {
+    return null
+  }
+  if (!resend) {
+    resend = new Resend(env.RESEND_API_KEY)
+  }
+  return resend
+}
 
 const FROM_EMAIL = 'Yurpass <noreply@yurpass.com>'
 
@@ -13,8 +23,14 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<boolean> {
+  const client = getResendClient()
+  if (!client) {
+    logger.warn({ subject }, 'Email not sent — RESEND_API_KEY not configured')
+    return false
+  }
+
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await client.emails.send({
       from: FROM_EMAIL,
       to,
       subject,
