@@ -196,8 +196,9 @@ export default function RateEventScreen(): React.JSX.Element {
             >
               Envoyer ma notation
             </Button>
-          </BlurView>
-        </Animated.View>
+          </View>
+        </BlurView>
+      </Animated.View>
       </ScrollView>
 
       {showConfirmation && (

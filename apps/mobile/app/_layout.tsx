@@ -49,15 +49,7 @@ export default function RootLayout(): React.JSX.Element | null {
   const [appReady, setAppReady] = useState(false)
   const initialize = useAuthStore((s) => s.initialize)
 
-  const [fontsLoaded] = useFonts({
-    PlayfairDisplay: require('../assets/fonts/PlayfairDisplay-Regular.ttf'),
-    'PlayfairDisplay-Bold': require('../assets/fonts/PlayfairDisplay-Bold.ttf'),
-    Inter: require('../assets/fonts/Inter-Regular.ttf'),
-    'Inter-Medium': require('../assets/fonts/Inter-Medium.ttf'),
-    'Inter-SemiBold': require('../assets/fonts/Inter-SemiBold.ttf'),
-    'Inter-Bold': require('../assets/fonts/Inter-Bold.ttf'),
-    CormorantGaramond: require('../assets/fonts/CormorantGaramond-Regular.ttf'),
-  })
+  const [fontsLoaded] = useFonts({})
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
