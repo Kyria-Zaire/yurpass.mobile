@@ -68,6 +68,12 @@ vi.mock('../../lib/env.js', () => ({
   env: { REDIS_URL: 'redis://localhost:6379' },
 }))
 
+vi.mock('../../models/sam-mission.model.js', () => ({
+  SamMission: {
+    create: vi.fn().mockResolvedValue({ publicId: 'mission-xx' }),
+  },
+}))
+
 vi.mock('nanoid', () => ({
   nanoid: (n?: number) => 'x'.repeat(n ?? 21),
 }))
