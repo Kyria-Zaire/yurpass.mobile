@@ -17,6 +17,8 @@ function ensureConfigured(): void {
 export interface CloudinaryUploadResult {
   publicId: string
   secureUrl: string
+  width: number
+  height: number
 }
 
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
@@ -65,6 +67,34 @@ export async function uploadAvatar(
   return {
     publicId: result.public_id,
     secureUrl: result.secure_url,
+    width: result.width,
+    height: result.height,
+  }
+}
+
+export async function uploadEventPhoto(
+  buffer: ArrayBuffer,
+  eventId: string,
+): Promise<CloudinaryUploadResult> {
+  ensureConfigured()
+
+  const base64 = Buffer.from(buffer).toString('base64')
+  const dataUri = `data:image/webp;base64,${base64}`
+
+  const result = await cloudinary.uploader.upload(dataUri, {
+    folder: `yurpass/events/${eventId}`,
+    transformation: [
+      { width: 2000, height: 2000, crop: 'limit' },
+      { format: 'webp', quality: 'auto' },
+    ],
+    resource_type: 'image',
+  })
+
+  return {
+    publicId: result.public_id,
+    secureUrl: result.secure_url,
+    width: result.width,
+    height: result.height,
   }
 }
 
