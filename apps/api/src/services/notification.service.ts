@@ -192,6 +192,24 @@ export class NotificationService {
     void NotificationService.sendToUsers(userIds, payload)
   }
 
+  static notifyParticipationCancelled(
+    hostId: string,
+    eventTitle: string,
+    guestDisplayName: string,
+    eventId: string,
+  ): void {
+    const payload: PushNotificationPayload = {
+      type: NotificationType.PARTICIPATION_CANCELLED,
+      title: 'Annulation invité',
+      body: `${guestDisplayName} a annulé sa participation à ${eventTitle}`,
+      data: {
+        eventId,
+        deepLink: `/(app)/events/${eventId}/guests`,
+      },
+    }
+    void NotificationService.sendToUser(hostId, payload)
+  }
+
   // ─── CRON: J-1 event reminders ─────────────────────────
 
   static async sendEventReminders(): Promise<void> {

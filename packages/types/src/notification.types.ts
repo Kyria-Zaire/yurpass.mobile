@@ -4,6 +4,7 @@ export enum NotificationType {
   GUEST_INVITED = 'GUEST_INVITED',
   EVENT_REMINDER = 'EVENT_REMINDER',
   EVENT_CANCELLED = 'EVENT_CANCELLED',
+  PARTICIPATION_CANCELLED = 'PARTICIPATION_CANCELLED',
 }
 
 export interface PushNotificationPayload {

@@ -417,6 +417,96 @@ export class GuestService {
     }
   }
 
+  // ─── Cancel participation (guest action — RB-011) ──────────
+
+  static async cancelParticipation(
+    userId: string,
+    participationId: string,
+  ): Promise<void> {
+    const participation = await Participation.findOne({
+      publicId: participationId,
+      userId,
+    })
+
+    if (!participation) {
+      throw new NotFoundError('Participation introuvable')
+    }
+
+    // Only PENDING or APPROVED can be cancelled
+    const cancellableStatuses = [ParticipationStatus.PENDING, ParticipationStatus.APPROVED]
+    if (!cancellableStatuses.includes(participation.status as ParticipationStatus)) {
+      throw new AppError(
+        'Seules les participations en attente ou approuvées peuvent être annulées',
+        422,
+        'INVALID_STATUS',
+      )
+    }
+
+    const event = await findEventOrThrow(participation.eventId)
+
+    // RB-011: Cannot cancel less than 2h before event start
+    const twoHoursBefore = new Date(event.schedule.startDate.getTime() - 2 * 60 * 60 * 1000)
+    if (new Date() > twoHoursBefore) {
+      throw new AppError(
+        'Annulation impossible moins de 2h avant le début de l\'événement',
+        422,
+        'CANCELLATION_TOO_LATE',
+      )
+    }
+
+    const wasApproved = participation.status === ParticipationStatus.APPROVED
+
+    // Update status + invalidate access code
+    await Participation.updateOne(
+      { _id: participation._id },
+      {
+        $set: {
+          status: ParticipationStatus.CANCELLED,
+          ...(wasApproved ? { 'accessCode.invalidated': true } : {}),
+        },
+      },
+    )
+
+    // Decrement confirmed capacity if was approved
+    if (wasApproved) {
+      await Event.updateOne(
+        { publicId: participation.eventId, 'capacity.confirmed': { $gt: 0 } },
+        { $inc: { 'capacity.confirmed': -1 } },
+      )
+
+      // If event was FULL, revert to PUBLISHED
+      await Event.updateOne(
+        { publicId: participation.eventId, status: EventStatus.FULL },
+        { $set: { status: EventStatus.PUBLISHED } },
+      )
+    }
+
+    await AuditLog.create({
+      action: AuditAction.PARTICIPATION_CANCELLED,
+      userId,
+      eventId: participation.eventId,
+      metadata: { participationId, previousStatus: participation.status },
+      result: AuditResult.SUCCESS,
+    })
+
+    logger.info({ participationId, userId, eventId: participation.eventId }, 'Participation cancelled')
+
+    // Notify host
+    const guestUser = await User.findOne(
+      { publicId: userId, deletedAt: null },
+      { 'profile.displayName': 1 },
+    ).lean()
+
+    const displayName = (guestUser?.profile as { displayName?: string })?.displayName ?? 'Un invité'
+
+    NotificationService.notifyParticipationCancelled(
+      event.hostId,
+      event.title,
+      displayName,
+      event.publicId,
+    )
+  }
+
   // ─── Get my ticket (guest) — event + participation + optional access code ─
 
   static async getMyParticipation(

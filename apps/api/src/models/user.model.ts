@@ -10,6 +10,7 @@ interface IUserDocument extends Document {
   profile: {
     displayName: string
     avatarUrl?: string
+    cloudinaryAvatarId?: string
     bio?: string
     city: string
     verifiedAt?: Date
@@ -68,6 +69,7 @@ const userSchema = new Schema<IUserDocument>(
     profile: {
       displayName: { type: String, required: true },
       avatarUrl: String,
+      cloudinaryAvatarId: String,
       bio: { type: String, maxlength: 500 },
       city: { type: String, required: true },
       verifiedAt: Date,

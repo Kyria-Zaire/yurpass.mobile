@@ -2,6 +2,7 @@ export * from './auth.types.js'
 export * from './event.types.js'
 export * from './guest.types.js'
 export * from './notification.types.js'
+export * from './rating.types.js'
 
 // ─── Enums ───────────────────────────────────────────────
 
@@ -29,6 +30,7 @@ export enum ParticipationStatus {
   WAITLIST = 'waitlist',
   ATTENDED = 'attended',
   NO_SHOW = 'no-show',
+  CANCELLED = 'cancelled',
 }
 
 export enum AuditAction {
@@ -63,6 +65,9 @@ export enum AuditAction {
   SAM_ASSIGNED = 'SAM_ASSIGNED',
   ADDRESS_REVEALED = 'ADDRESS_REVEALED',
   PUSH_TOKEN_REGISTERED = 'PUSH_TOKEN_REGISTERED',
+  RATING_SUBMITTED = 'RATING_SUBMITTED',
+  PARTICIPATION_CANCELLED = 'PARTICIPATION_CANCELLED',
+  PROFILE_UPDATED = 'PROFILE_UPDATED',
 }
 
 export enum SubscriptionPlan {

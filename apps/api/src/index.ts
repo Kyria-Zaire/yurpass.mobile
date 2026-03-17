@@ -14,6 +14,8 @@ import { meRoutes } from './routes/me.routes.js'
 import { createAccountWorker } from './workers/account.worker.js'
 import { createNotificationWorker } from './workers/notification.worker.js'
 import { createNotificationCron } from './workers/notification-cron.js'
+import { ratingsRoutes } from './routes/ratings.routes.js'
+import { createReputationWorker, createReputationCron } from './workers/reputation.worker.js'
 
 const app = new Hono()
 
@@ -24,6 +26,7 @@ app.route('/roles', rolesRoutes)
 app.route('/events', eventsRoutes)
 app.route('/events', guestsRoutes)
 app.route('/me', meRoutes)
+app.route('/ratings', ratingsRoutes)
 
 async function bootstrap(): Promise<void> {
   try {
@@ -56,6 +59,15 @@ async function bootstrap(): Promise<void> {
       logger.info('Notification cron started')
     } catch (workerError: unknown) {
       logger.warn({ workerError }, 'Notification workers failed to start — running without push notifications')
+    }
+
+    try {
+      createReputationWorker()
+      logger.info('Reputation worker started')
+      createReputationCron()
+      logger.info('Reputation cron started')
+    } catch (workerError: unknown) {
+      logger.warn({ workerError }, 'Reputation workers failed to start — running without reputation jobs')
     }
 
     serve({ fetch: app.fetch, port: env.PORT }, (info) => {
