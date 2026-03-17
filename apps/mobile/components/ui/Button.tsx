@@ -15,8 +15,6 @@ interface ButtonProps {
   loading?: boolean
 }
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-
 const SIZE_STYLES: Record<ButtonSize, { container: ViewStyle; text: TextStyle }> = {
   sm: {
     container: { paddingVertical: 8, paddingHorizontal: 16 },
@@ -79,30 +77,33 @@ export function Button({
   const sizeStyle = SIZE_STYLES[size]
 
   return (
-    <AnimatedPressable
+    <Pressable
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled || loading}
-      style={[
-        styles.base,
-        variantStyle.container,
-        sizeStyle.container,
-        disabled && styles.disabled,
-        animatedStyle,
-      ]}
     >
-      {loading ? (
-        <ActivityIndicator
-          color={variant === 'primary' ? '#FFFFFF' : COLORS.accent}
-          size="small"
-        />
-      ) : (
-        <Text style={[styles.text, variantStyle.text, sizeStyle.text]}>
-          {children}
-        </Text>
-      )}
-    </AnimatedPressable>
+      <Animated.View
+        style={[
+          styles.base,
+          variantStyle.container as Record<string, unknown>,
+          sizeStyle.container as Record<string, unknown>,
+          disabled && styles.disabled,
+          animatedStyle,
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator
+            color={variant === 'primary' ? '#FFFFFF' : COLORS.accent}
+            size="small"
+          />
+        ) : (
+          <Text style={[styles.text, variantStyle.text, sizeStyle.text]}>
+            {children}
+          </Text>
+        )}
+      </Animated.View>
+    </Pressable>
   )
 }
 
