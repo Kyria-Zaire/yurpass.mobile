@@ -17,6 +17,10 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().optional().default(''),
   CLOUDINARY_API_SECRET: z.string().optional().default(''),
   RESEND_API_KEY: z.string().optional().default(''),
+  /** Optional 32+ char key to encrypt ticket codes for guest display (QR). When set, code is stored encrypted and returned on GET my ticket. */
+  TICKET_CODE_ENCRYPTION_KEY: z.string().min(32).optional(),
+  /** Optional Expo access token for authenticated push API calls */
+  EXPO_ACCESS_TOKEN: z.string().optional(),
 })
 
 export type Env = z.infer<typeof envSchema>

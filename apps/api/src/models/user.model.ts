@@ -19,6 +19,11 @@ interface IUserDocument extends Document {
     totalRatings: number
     avgRating: number
   }
+  pushTokens: Array<{
+    token: string
+    platform: 'ios' | 'android'
+    addedAt: Date
+  }>
   security: {
     twoFactorEnabled: boolean
     twoFactorSecret?: string
@@ -72,6 +77,14 @@ const userSchema = new Schema<IUserDocument>(
       totalRatings: { type: Number, default: 0 },
       avgRating: { type: Number, default: 0, min: 0, max: 5 },
     },
+    pushTokens: [
+      {
+        _id: false,
+        token: { type: String, required: true },
+        platform: { type: String, enum: ['ios', 'android'], required: true },
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
     security: {
       twoFactorEnabled: { type: Boolean, default: false },
       twoFactorSecret: String,
@@ -103,6 +116,7 @@ userSchema.set('toJSON', {
     delete obj._id
     delete obj.__v
     delete obj.passwordHash
+    delete obj.pushTokens
     delete obj.security
     return obj
   },

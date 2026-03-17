@@ -1,3 +1,6 @@
 export * from './base.js'
 export * from './auth.validators.js'
 export * from './role.validators.js'
+export * from './event.validators.js'
+export * from './guest.validators.js'
+export * from './notification.validators.js'

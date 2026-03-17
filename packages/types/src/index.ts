@@ -1,4 +1,7 @@
 export * from './auth.types.js'
+export * from './event.types.js'
+export * from './guest.types.js'
+export * from './notification.types.js'
 
 // ─── Enums ───────────────────────────────────────────────
 
@@ -55,6 +58,11 @@ export enum AuditAction {
   ACCOUNT_DELETED = 'ACCOUNT_DELETED',
   ACCOUNT_ANONYMIZED = 'ACCOUNT_ANONYMIZED',
   ROLE_REQUESTED = 'ROLE_REQUESTED',
+  EVENT_PUBLISHED = 'EVENT_PUBLISHED',
+  EVENT_UPDATED = 'EVENT_UPDATED',
+  SAM_ASSIGNED = 'SAM_ASSIGNED',
+  ADDRESS_REVEALED = 'ADDRESS_REVEALED',
+  PUSH_TOKEN_REGISTERED = 'PUSH_TOKEN_REGISTERED',
 }
 
 export enum SubscriptionPlan {
@@ -176,7 +184,7 @@ export interface IParticipationContribution {
 }
 
 export interface IParticipationAccessCode {
-  code: string
+  codeHash: string
   generatedAt: Date
   usedAt?: Date
   invalidated: boolean

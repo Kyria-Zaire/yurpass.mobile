@@ -13,10 +13,12 @@ interface IParticipationDocument extends Document {
     validatedBy?: string
   }
   accessCode?: {
-    code: string
+    codeHash: string
     generatedAt: Date
     usedAt?: Date
     invalidated: boolean
+    /** Encrypted plain code for guest ticket display (QR). Decrypted only for GET my ticket. */
+    plainEncrypted?: string
   }
   invitedBy?: string
   hostNote?: string
@@ -51,10 +53,11 @@ const participationSchema = new Schema<IParticipationDocument>(
       validatedBy: String,
     },
     accessCode: {
-      code: String,
+      codeHash: String,
       generatedAt: Date,
       usedAt: Date,
       invalidated: { type: Boolean, default: false },
+      plainEncrypted: String,
     },
     invitedBy: String,
     hostNote: { type: String, maxlength: 500 },

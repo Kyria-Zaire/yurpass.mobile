@@ -9,6 +9,8 @@ import {
   requestRoleSchema,
   emailSchema,
   passwordSchema,
+  registerPushTokenSchema,
+  removePushTokenSchema,
 } from '../index.js'
 
 describe('Base Schemas', () => {
@@ -176,6 +178,58 @@ describe('Auth Validators', () => {
 
     it('should reject invalid role', () => {
       expect(requestRoleSchema.safeParse({ role: 'superadmin' }).success).toBe(false)
+    })
+  })
+})
+
+describe('Notification Validators', () => {
+  describe('registerPushTokenSchema', () => {
+    it('should accept valid Expo push token', () => {
+      const result = registerPushTokenSchema.safeParse({
+        token: 'ExponentPushToken[abc123xyz]',
+        platform: 'ios',
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('should reject invalid token format (missing prefix)', () => {
+      const result = registerPushTokenSchema.safeParse({
+        token: 'not-a-push-token',
+        platform: 'android',
+      })
+      expect(result.success).toBe(false)
+    })
+
+    it('should reject empty brackets', () => {
+      const result = registerPushTokenSchema.safeParse({
+        token: 'ExponentPushToken[]',
+        platform: 'ios',
+      })
+      expect(result.success).toBe(false)
+    })
+
+    it('should reject invalid platform', () => {
+      const result = registerPushTokenSchema.safeParse({
+        token: 'ExponentPushToken[abc]',
+        platform: 'windows',
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('removePushTokenSchema', () => {
+    it('should accept valid token for removal', () => {
+      const result = removePushTokenSchema.safeParse({
+        token: 'ExponentPushToken[xyz789]',
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('should reject invalid token for removal', () => {
+      const result = removePushTokenSchema.safeParse({
+        token: 'invalid-format',
+      })
+      expect(result.success).toBe(false)
     })
   })
 })
