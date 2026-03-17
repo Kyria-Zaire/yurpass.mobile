@@ -52,7 +52,15 @@ vi.mock('../../models/participation.model.js', () => ({
 
 vi.mock('../../models/user.model.js', () => ({
   User: {
-    findOne: (...args: unknown[]) => mockUser.findOne(...args),
+    findOne: (...args: unknown[]) => {
+      const result = mockUser.findOne(...args)
+      // Must be thenable (for await without .lean()) AND have .lean() (for chained calls)
+      const query = result && typeof result.then === 'function'
+        ? result
+        : Promise.resolve(result)
+      ;(query as Record<string, unknown>).lean = () => result
+      return query
+    },
     find: vi.fn().mockReturnValue({ lean: vi.fn().mockResolvedValue([]) }),
   },
 }))
@@ -97,6 +105,7 @@ vi.mock('./notification.service.js', () => ({
     notifyGuestRejected: vi.fn(),
     notifyGuestInvited: vi.fn(),
     notifyEventCancelled: vi.fn(),
+    notifyParticipationCancelled: vi.fn(),
     sendToUser: vi.fn(),
     sendToUsers: vi.fn(),
   },
@@ -447,6 +456,129 @@ describe('GuestService', () => {
       expect(mockParticipation.updateOne).toHaveBeenCalledWith(
         expect.anything(),
         { $set: { status: ParticipationStatus.REJECTED } },
+      )
+    })
+  })
+
+  // ─── cancelParticipation (RB-011) ──────────────────────
+
+  describe('cancelParticipation', () => {
+    it('should cancel participation 3h before startDate', async () => {
+      const event = makeMockEventDoc({
+        schedule: {
+          startDate: new Date(Date.now() + 3 * 60 * 60 * 1000), // 3h from now
+          endDate: new Date(Date.now() + 9 * 60 * 60 * 1000),
+          doorsOpenAt: new Date(Date.now() + 2.5 * 60 * 60 * 1000),
+        },
+      })
+
+      mockParticipation.findOne.mockResolvedValue(
+        makeMockParticipation({
+          status: ParticipationStatus.APPROVED,
+          accessCode: { codeHash: 'hash', generatedAt: new Date(), invalidated: false },
+        }),
+      )
+      mockEvent.findOne.mockResolvedValue(event)
+      mockParticipation.updateOne.mockResolvedValue({})
+      mockEvent.updateOne.mockResolvedValue({})
+      mockUser.findOne.mockResolvedValue({
+        profile: { displayName: 'Jean Dupont' },
+      })
+
+      await GuestService.cancelParticipation('guest-001', 'part-001')
+
+      // Status → CANCELLED
+      expect(mockParticipation.updateOne).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          $set: expect.objectContaining({
+            status: ParticipationStatus.CANCELLED,
+            'accessCode.invalidated': true,
+          }),
+        },
+      )
+
+      // Audit log
+      expect(mockAuditLog.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: AuditAction.PARTICIPATION_CANCELLED,
+          result: AuditResult.SUCCESS,
+        }),
+      )
+    })
+
+    it('RB-011: should reject cancellation 1h before startDate', async () => {
+      const event = makeMockEventDoc({
+        schedule: {
+          startDate: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1h from now
+          endDate: new Date(Date.now() + 7 * 60 * 60 * 1000),
+          doorsOpenAt: new Date(Date.now() + 0.5 * 60 * 60 * 1000),
+        },
+      })
+
+      mockParticipation.findOne.mockResolvedValue(
+        makeMockParticipation({ status: ParticipationStatus.APPROVED }),
+      )
+      mockEvent.findOne.mockResolvedValue(event)
+
+      await expect(
+        GuestService.cancelParticipation('guest-001', 'part-001'),
+      ).rejects.toThrow('Annulation impossible')
+    })
+
+    it('should invalidate access code after cancellation', async () => {
+      const event = makeMockEventDoc({
+        schedule: {
+          startDate: new Date(Date.now() + 5 * 60 * 60 * 1000),
+          endDate: new Date(Date.now() + 11 * 60 * 60 * 1000),
+          doorsOpenAt: new Date(Date.now() + 4.5 * 60 * 60 * 1000),
+        },
+      })
+
+      mockParticipation.findOne.mockResolvedValue(
+        makeMockParticipation({
+          status: ParticipationStatus.APPROVED,
+          accessCode: { codeHash: 'hash-xxx', generatedAt: new Date(), invalidated: false },
+        }),
+      )
+      mockEvent.findOne.mockResolvedValue(event)
+      mockParticipation.updateOne.mockResolvedValue({})
+      mockEvent.updateOne.mockResolvedValue({})
+      mockUser.findOne.mockResolvedValue({ profile: { displayName: 'Test' } })
+
+      await GuestService.cancelParticipation('guest-001', 'part-001')
+
+      const updateCall = mockParticipation.updateOne.mock.calls[0]
+      const $set = (updateCall[1] as Record<string, unknown>).$set as Record<string, unknown>
+      expect($set['accessCode.invalidated']).toBe(true)
+    })
+
+    it('should decrement capacity.confirmed atomically', async () => {
+      const event = makeMockEventDoc({
+        schedule: {
+          startDate: new Date(Date.now() + 5 * 60 * 60 * 1000),
+          endDate: new Date(Date.now() + 11 * 60 * 60 * 1000),
+          doorsOpenAt: new Date(Date.now() + 4.5 * 60 * 60 * 1000),
+        },
+      })
+
+      mockParticipation.findOne.mockResolvedValue(
+        makeMockParticipation({ status: ParticipationStatus.APPROVED }),
+      )
+      mockEvent.findOne.mockResolvedValue(event)
+      mockParticipation.updateOne.mockResolvedValue({})
+      mockEvent.updateOne.mockResolvedValue({})
+      mockUser.findOne.mockResolvedValue({ profile: { displayName: 'Test' } })
+
+      await GuestService.cancelParticipation('guest-001', 'part-001')
+
+      // Verify $inc: { 'capacity.confirmed': -1 }
+      expect(mockEvent.updateOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          publicId: 'evt-test-01',
+          'capacity.confirmed': { $gt: 0 },
+        }),
+        { $inc: { 'capacity.confirmed': -1 } },
       )
     })
   })
