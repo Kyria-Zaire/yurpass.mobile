@@ -210,6 +210,80 @@ export class NotificationService {
     void NotificationService.sendToUser(hostId, payload)
   }
 
+  // ─── SAM notifications ────────────────────────────────
+
+  static notifySamMissionConfirmed(
+    hostId: string,
+    eventTitle: string,
+    eventId: string,
+  ): void {
+    const payload: PushNotificationPayload = {
+      type: NotificationType.SAM_MISSION_CONFIRMED,
+      title: 'SAM confirmé',
+      body: `Le SAM a confirmé sa mission pour ${eventTitle}`,
+      data: {
+        eventId,
+        deepLink: `/(app)/events/${eventId}`,
+      },
+    }
+    void NotificationService.sendToUser(hostId, payload)
+  }
+
+  static notifySamMissionCompleted(
+    hostId: string,
+    eventTitle: string,
+    eventId: string,
+    missionId: string,
+  ): void {
+    const payload: PushNotificationPayload = {
+      type: NotificationType.SAM_MISSION_COMPLETED,
+      title: 'Rapport SAM disponible',
+      body: `La mission SAM pour ${eventTitle} est terminée`,
+      data: {
+        eventId,
+        deepLink: `/(app)/sam/missions/${missionId}/report`,
+      },
+    }
+    void NotificationService.sendToUser(hostId, payload)
+  }
+
+  static notifySamUrgentIncident(
+    adminIds: string[],
+    eventTitle: string,
+    eventId: string,
+    missionId: string,
+  ): void {
+    const payload: PushNotificationPayload = {
+      type: NotificationType.SAM_URGENT_INCIDENT,
+      title: '🚨 Incident urgent SAM',
+      body: `Incident urgent signalé pour ${eventTitle}`,
+      data: {
+        eventId,
+        deepLink: `/(app)/sam/missions/${missionId}/report`,
+      },
+    }
+    void NotificationService.sendToUsers(adminIds, payload)
+  }
+
+  // ─── Media notifications ─────────────────────────────────
+
+  static notifyMediaModerationPending(
+    adminIds: string[],
+    eventTitle: string,
+    eventId: string,
+  ): void {
+    const payload: PushNotificationPayload = {
+      type: NotificationType.MEDIA_MODERATION_PENDING,
+      title: 'Photo en attente',
+      body: `Nouvelle photo à modérer pour ${eventTitle}`,
+      data: {
+        eventId,
+        deepLink: `/(app)/admin/moderation`,
+      },
+    }
+    void NotificationService.sendToUsers(adminIds, payload)
+  }
+
   // ─── CRON: J-1 event reminders ─────────────────────────
 
   static async sendEventReminders(): Promise<void> {

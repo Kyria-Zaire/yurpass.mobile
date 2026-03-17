@@ -3,6 +3,7 @@ import { Event } from '../models/event.model.js'
 import { Participation } from '../models/participation.model.js'
 import { User } from '../models/user.model.js'
 import { AuditLog } from '../models/audit-log.model.js'
+import { SamMission } from '../models/sam-mission.model.js'
 import { logger } from '../lib/logger.js'
 import {
   EventStatus,
@@ -259,6 +260,14 @@ export class EventService {
       { _id: event._id },
       { $set: { samId } },
     )
+
+    // Create SAM mission
+    await SamMission.create({
+      eventId,
+      samId,
+      hostId,
+      status: 'assigned',
+    })
 
     await AuditLog.create({
       action: AuditAction.SAM_ASSIGNED,
