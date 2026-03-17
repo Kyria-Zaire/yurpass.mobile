@@ -16,6 +16,9 @@ import { createNotificationWorker } from './workers/notification.worker.js'
 import { createNotificationCron } from './workers/notification-cron.js'
 import { ratingsRoutes } from './routes/ratings.routes.js'
 import { createReputationWorker, createReputationCron } from './workers/reputation.worker.js'
+import { samRoutes } from './routes/sam.routes.js'
+import { mediaRoutes } from './routes/media.routes.js'
+import { adminRoutes } from './routes/admin.routes.js'
 
 const app = new Hono()
 
@@ -27,6 +30,9 @@ app.route('/events', eventsRoutes)
 app.route('/events', guestsRoutes)
 app.route('/me', meRoutes)
 app.route('/ratings', ratingsRoutes)
+app.route('/sam', samRoutes)
+app.route('/', mediaRoutes)
+app.route('/admin', adminRoutes)
 
 async function bootstrap(): Promise<void> {
   try {
